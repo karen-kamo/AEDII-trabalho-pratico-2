@@ -55,6 +55,10 @@ int main(){
       atualizar_registro();
       break;
 
+    case 10:
+      criar_grafo();
+      break;
+
     default:
       printf("Opção inválida.\n");
   }

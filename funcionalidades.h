@@ -91,5 +91,10 @@ void atualizar_registro();
 RegistroDado *executar_busca_indexada(RegistroDadoIndice *listaIndice, int nRegistrosIndice, RegistroCabecalho *h, FILE *arqBin, int *posSequencial);
 
 
+/*!
+* @brief Funcionalidade 10 para criar o grafo a partir do arquivo de dados.
+*
+*/
+void criar_grafo();
 
 #endif
