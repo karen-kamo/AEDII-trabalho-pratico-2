@@ -42,6 +42,26 @@ typedef struct {
   int RRN;        // int de 4 bytes
 } RegistroDadoIndice;
 
+// Struct para o Nó da lista linear (Aresta)
+typedef struct Aresta{
+  char nomeProxEst[50]; // nome da pŕxoima estação
+  int distancia;        // distância até próxima estação
+  char nomesLinha[100]; // nomes das linhas associadas
+  struct Aresta *prox;  // próximo nó da lista
+} Aresta;
+
+// Struct do Vértice
+typedef struct {
+  char nomeEstacao[50]; // nome da estação
+  Aresta *inicioLista;  // ponteiro para o 1 nó de conexões
+} Vertice;
+
+// Struct do Grafo
+typedef struct {
+  Vertice *vertices; // vetor dinâmico de vértices
+  int nroVertices;   // quant de estações únicas
+} Grafo;
+
 /*! 
  * @brief Desaloca os campos dinâmicamente alocados do registro de cabeçalho.
  * 
