@@ -41,17 +41,17 @@ void criar_grafo() {
     return;
   }
 
-  RegistroCabecalho *h = (RegistroCabecalho *) malloc(sizeof(RegistroCabecalho)); // alocação do registro de cabeçalho
-  if (h == NULL){ // verifica se a alocação não ocorreu ou se é inconsistente
+  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
+  if (h == NULL){ // verifica se a alocação não ocorreu
     printf("Falha na execução da funcionalidade.\n");
     fclose(arqBin);
     return;
   }
 
   // vendo se é inconsistente 
-  h = ler_reg_cab_bin(arqBin);
   if (h->status == '0'){
     printf("Falha na execução da funcionalidade.\n");
+    free(h);
     fclose(arqBin);
     return;
   }
@@ -166,11 +166,15 @@ void criar_grafo() {
   for (int i = 0; i < g.nroVertices; i++) {
     // só imprime a linha se a estação tiver caminhos saindo dela
     if (g.vertices[i].inicioLista != NULL) {
-      printf("%s", g.vertices[i].nomeEstacao);
+      printf("%s,", g.vertices[i].nomeEstacao);
       
       Aresta *aresta = g.vertices[i].inicioLista;
       while (aresta != NULL) {
-        printf(" %s %d %s", aresta->nomeProxEst, aresta->distancia, aresta->nomesLinha);
+        printf(" %s, %d, %s", aresta->nomeProxEst, aresta->distancia, aresta->nomesLinha);
+
+        // se ainda tiver uma próxima aresta depois dessa
+        if (aresta->prox != NULL) printf(",");
+
         aresta = aresta->prox;
       }
       printf("\n");

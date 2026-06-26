@@ -492,10 +492,12 @@ void inserir_aresta_ordenada(Vertice *v, char *nomeProx, int dist, char *nomeLin
   // verifica se já existe conexão para essa mesma estação de destino
   while (atual != NULL) {
     if (strcmp(atual->nomeProxEst, nomeProx) == 0) {
-      // se já existe e a nova linha for diferente, concatena separado por um espaço
+      // se já existe e a nova linha for diferente, adiciona
       if (strstr(atual->nomesLinha, nomeLinha) == NULL) {
-        strcat(atual->nomesLinha, " ");
+        strcat(atual->nomesLinha, ", ");
         strcat(atual->nomesLinha, nomeLinha);
+
+        ordenar_linhas(atual->nomesLinha);
       }
       return; 
     }
@@ -530,5 +532,42 @@ void inserir_aresta_ordenada(Vertice *v, char *nomeProx, int dist, char *nomeLin
   } else { // inserção no meio ou fim
     nova->prox = atual;
     anterior->prox = nova;
+  }
+}
+
+////////////////////////////////////////////////
+
+void ordenar_linhas(char *nomesLinha) {
+  char cópia[200];
+  strcpy(cópia, nomesLinha);
+
+  char *palavras[20]; // pode até 20 linhas integradas na mesma estação
+  int qtd = 0;
+
+  // separa a string por vírgulas e espaços
+  char *token = strtok(cópia, ", ");
+  while (token != NULL) {
+    palavras[qtd++] = token;
+    token = strtok(NULL, ", ");
+  }
+
+  // Bubble Sort das palavras
+  for (int i = 0; i < qtd - 1; i++) {
+    for (int j = i + 1; j < qtd; j++) {
+      if (strcmp(palavras[i], palavras[j]) > 0) {
+        char *temp = palavras[i];
+        palavras[i] = palavras[j];
+        palavras[j] = temp;
+      }
+    }
+  }
+
+  // remonta a string original com as palavras ordenadas e separadas por ,
+  nomesLinha[0] = '\0';
+  for (int i = 0; i < qtd; i++) {
+    strcat(nomesLinha, palavras[i]);
+    if (i < qtd - 1) {
+      strcat(nomesLinha, ", ");
+    }
   }
 }

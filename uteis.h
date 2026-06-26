@@ -246,6 +246,12 @@ char *buscar_nome_por_codigo(FILE *arqBin, int codBuscado);
  */
 void inserir_aresta_ordenada(Vertice *v, char *nomeProx, int dist, char *nomeLinha);
 
+/*!
+ * @brief Função auxiliar para ordenar as linhas dentro da string.
+ *
+ * @param nomesLinha String com os nomes das linhas que devem ser ordenadas.
+ */
+void ordenar_linhas(char *nomesLinha);
 #endif
 
 
