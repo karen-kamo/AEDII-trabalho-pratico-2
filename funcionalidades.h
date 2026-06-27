@@ -92,9 +92,19 @@ RegistroDado *executar_busca_indexada(RegistroDadoIndice *listaIndice, int nRegi
 
 
 /*!
+ * @brief Função para criar o grafo a partir do arquivo de dados.
+ *
+ * @param arqBin Arquivo de dados a ser transformado em grafo.
+ * 
+ * @return Retorna o grafo criado a partir do arquivo de dados.
+ */
+Grafo criar_grafo(FILE *arqBin);
+
+
+/*!
 * @brief Funcionalidade 10 para criar o grafo a partir do arquivo de dados.
 *
 */
-void criar_grafo();
+void funcionalidade10();
 
 #endif

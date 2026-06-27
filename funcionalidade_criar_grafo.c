@@ -14,56 +14,15 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "funcionalidades.h"
 #include "uteis.h"
 
-/* ================================================================================
-
-******************************FUNCIONALIDADE 10************************************
-
-===================================================================================*/ 
-/* Funcionalidades: 
-  1. Abrir arquivo de dados para leitura
-  2. Criar e inicializar o grafo
-  3. Ler todo o arquivo de dados para guardar os vértices
-  4. Ler todo o arquivo de dados para guardar as arestas
-  5. Impressão do grafo
-  6. Liberação da memória e close
-*/
-
-void criar_grafo() {
-  // 1. Abrir arquivo de dados para leitura
-  char nomeArqBin[100];
-
-  scanf("%s", nomeArqBin); // leitura dos inputs do usuário
-
-  // abrir arquivo bin para leitura
-  FILE *arqBin = fopen(nomeArqBin, "rb");
-  if (arqBin == NULL) {
-    printf("Falha na execução da funcionalidade.\n");
-    return;
-  }
-
-  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
-  if (h == NULL){ // verifica se a alocação não ocorreu
-    printf("Falha na execução da funcionalidade.\n");
-    fclose(arqBin);
-    return;
-  }
-
-  // vendo se é inconsistente 
-  if (h->status == '0'){
-    printf("Falha na execução da funcionalidade.\n");
-    free(h);
-    fclose(arqBin);
-    return;
-  }
-
-  // 2. Criar e inicializar o grafo
+Grafo criar_grafo(FILE *arqBin){
+  // Criar e inicializar o grafo
   Grafo g;
   g.nroVertices = 0;
   g.vertices = NULL;
 
   fseek(arqBin, 17, SEEK_SET); // pula o cabeçalho
 
-  // 3. Ler todo o arquivo de dados para guardar os vértices
+  // Ler todo o arquivo de dados para guardar os vértices
   while (check_eof(arqBin)){
     RegistroDado *r = ler_reg_dado_bin(arqBin);
     if (r == NULL) break; // se não conseguiu ler
@@ -107,7 +66,7 @@ void criar_grafo() {
   // ordena pelo nomeEstacao
   qsort(g.vertices, g.nroVertices, sizeof(Vertice), comparar_vertices);
 
-  // 4. Ler todo o arquivo de dados para guardar as arestas
+  // Ler todo o arquivo de dados para guardar as arestas
   fseek(arqBin, 17, SEEK_SET); // pula o cabeçalho
 
   while (check_eof(arqBin)){
@@ -162,7 +121,55 @@ void criar_grafo() {
     free(r);
   }
 
-  // 5. Impressão do grafo
+  return g;
+}
+
+/* ================================================================================
+
+******************************FUNCIONALIDADE 10************************************
+
+===================================================================================*/ 
+/* Funcionalidades: 
+  1. Abrir arquivo de dados para leitura
+  2. Criar e inicializar o grafo
+  3. Ler todo o arquivo de dados para guardar os vértices
+  4. Ler todo o arquivo de dados para guardar as arestas
+  5. Impressão do grafo
+  6. Liberação da memória e close
+*/
+
+void funcionalidade10() {
+  // 1. Abrir arquivo de dados para leitura
+  char nomeArqBin[100];
+
+  scanf("%s", nomeArqBin); // leitura dos inputs do usuário
+
+  // abrir arquivo bin para leitura
+  FILE *arqBin = fopen(nomeArqBin, "rb");
+  if (arqBin == NULL) {
+    printf("Falha na execução da funcionalidade.\n");
+    return;
+  }
+
+  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
+  if (h == NULL){ // verifica se a alocação não ocorreu
+    printf("Falha na execução da funcionalidade.\n");
+    fclose(arqBin);
+    return;
+  }
+
+  // vendo se é inconsistente 
+  if (h->status == '0'){
+    printf("Falha na execução da funcionalidade.\n");
+    free(h);
+    fclose(arqBin);
+    return;
+  }
+
+  // 2. Criar o grafo
+  Grafo g = criar_grafo(arqBin);
+
+  // 3. Impressão do grafo
   for (int i = 0; i < g.nroVertices; i++) {
     // só imprime a linha se a estação tiver caminhos saindo dela
     if (g.vertices[i].inicioLista != NULL) {
@@ -181,16 +188,8 @@ void criar_grafo() {
     }
   }
 
-  // 6. Liberação da memória e close
-  for (int i = 0; i < g.nroVertices; i++) {
-    Aresta *aresta = g.vertices[i].inicioLista;
-    while (aresta != NULL) {
-      Aresta *aux = aresta->prox;
-      free(aresta);
-      aresta = aux;
-    }
-  }
-  free(g.vertices);
+  // 4. Liberação da memória e close
+  free_grafo(g);
   free(h);
   fclose(arqBin);
 }

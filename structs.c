@@ -23,3 +23,17 @@ void free_reg_dado(RegistroDado* r){
     r->nomeLinha = NULL;
   }
 }
+
+void free_grafo(Grafo g){
+  if (g.vertices == NULL) return;
+  
+  for (int i = 0; i < g.nroVertices; i++) {
+    Aresta *aresta = g.vertices[i].inicioLista;
+    while (aresta != NULL) {
+      Aresta *aux = aresta->prox;
+      free(aresta);
+      aresta = aux;
+    }
+  }
+  free(g.vertices);
+}

@@ -76,4 +76,10 @@ void free_reg_cab(RegistroCabecalho* h);
  */
 void free_reg_dado(RegistroDado* r);
 
+/*! 
+ * @brief Desaloca o grafo.
+ * 
+ * @param g Grafo que precisa ser liberado.
+ */
+void free_grafo(Grafo g);
 #endif

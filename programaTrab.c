@@ -56,7 +56,7 @@ int main(){
       break;
 
     case 10:
-      criar_grafo();
+      funcionalidade10();
       break;
 
     default:
