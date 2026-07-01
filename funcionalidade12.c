@@ -14,187 +14,6 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "funcionalidades.h"
 #include "uteis.h"
 
-Grafo criar_grafo(FILE *arqBin){
-  // Criar e inicializar o grafo
-  Grafo g;
-  g.nroVertices = 0;
-  g.vertices = NULL;
-
-  fseek(arqBin, 17, SEEK_SET); // pula o cabeçalho
-
-  // Ler todo o arquivo de dados para guardar os vértices
-  while (check_eof(arqBin)){
-    RegistroDado *r = ler_reg_dado_bin(arqBin);
-    if (r == NULL) break; // se não conseguiu ler
-
-    // verifica se é logicamente removido
-    if (r->removido == '1') {
-      free_reg_dado(r);
-      free(r);
-      continue;
-    }
-
-    // guardar novo nomeEstacao
-    int flagExiste = 0; // p/ ver se tem mesmo nome
-
-    // percorre todos os vertices que existem
-    for (int i = 0; i < g.nroVertices; i++){
-      if (strcmp(g.vertices[i].nomeEstacao, r->nomeEstacao) == 0){
-        flagExiste = 1; // se o nome bater, quer dizer que já tem
-        break;
-      }
-    }
-
-    // se não ativou flag, é um novo nome
-    if (!flagExiste){
-      g.nroVertices++; // incrementa a quant de novos únicos
-
-      // realoca para caber mais um nome
-      g.vertices = realloc(g.vertices, g.nroVertices * sizeof(Vertice));
-
-      // salva o nome na lista
-      strcpy(g.vertices[g.nroVertices - 1].nomeEstacao, r->nomeEstacao);
-
-      // inicializa a sua lista de caminhos vazia
-      g.vertices[g.nroVertices - 1].inicioLista = NULL; 
-    }
-
-    free_reg_dado(r);
-    free(r);
-  }
-
-  // ordena pelo nomeEstacao
-  qsort(g.vertices, g.nroVertices, sizeof(Vertice), comparar_vertices);
-
-  // Ler todo o arquivo de dados para guardar as arestas
-  fseek(arqBin, 17, SEEK_SET); // pula o cabeçalho
-
-  while (check_eof(arqBin)){
-    RegistroDado *r = ler_reg_dado_bin(arqBin);
-    if (r == NULL) break; // se não conseguiu ler
-
-    // verifica se é logicamente removido
-    // verifica se é logicamente removido
-    if (r->removido == '1') {
-      free_reg_dado(r);
-      free(r);
-      continue;
-    }
-
-    // procurando o índice da estação atual no vetor
-    int indOrigem = -1; // para guardar o índice
-    for (int i = 0; i < g.nroVertices; i++){
-      if (strcmp(g.vertices[i].nomeEstacao, r->nomeEstacao) == 0){
-        // se o nome bater, achou o índice
-        indOrigem = i;
-        break;
-      }
-    }
-
-    // se acharmos o vértice de origem no vetor
-    if (indOrigem != -1){
-
-      // se tiver próxima estação, faz ligação
-      if (r->codProxEstacao != -1){
-        char *nomeProx = buscar_nome_por_codigo(arqBin, r->codProxEstacao);
-
-        // se achou o nome
-        if (nomeProx != NULL){
-          inserir_aresta_ordenada(&g.vertices[indOrigem], nomeProx, r->distProxEstacao, r->nomeLinha);
-          free(nomeProx);
-        }
-      }
-
-      // se tiver estação de integração, faz a ligação
-      if (r->codEstIntegra != -1){
-        char *nomeIntegra = buscar_nome_por_codigo(arqBin, r->codEstIntegra);
-
-        // só insere se o nome da integração for diferente da estação atual
-        if (nomeIntegra != NULL && strcmp(r->nomeEstacao, nomeIntegra) != 0){
-          inserir_aresta_ordenada(&g.vertices[indOrigem], nomeIntegra, 0, "Integração");
-          free(nomeIntegra);
-        }
-      }
-    }   
-
-    free_reg_dado(r);
-    free(r);
-  }
-
-  return g;
-}
-
-/* ================================================================================
-
-******************************FUNCIONALIDADE 10************************************
-
-===================================================================================*/ 
-/* Funcionalidades: 
-  1. Abrir arquivo de dados para leitura
-  2. Criar e inicializar o grafo
-  3. Ler todo o arquivo de dados para guardar os vértices
-  4. Ler todo o arquivo de dados para guardar as arestas
-  5. Impressão do grafo
-  6. Liberação da memória e close
-*/
-
-void funcionalidade10() {
-  // 1. Abrir arquivo de dados para leitura
-  char nomeArqBin[100];
-
-  scanf("%s", nomeArqBin); // leitura dos inputs do usuário
-
-  // abrir arquivo bin para leitura
-  FILE *arqBin = fopen(nomeArqBin, "rb");
-  if (arqBin == NULL) {
-    printf("Falha na execução da funcionalidade.\n");
-    return;
-  }
-
-  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
-  if (h == NULL){ // verifica se a alocação não ocorreu
-    printf("Falha na execução da funcionalidade.\n");
-    fclose(arqBin);
-    return;
-  }
-
-  // vendo se é inconsistente 
-  if (h->status == '0'){
-    printf("Falha na execução da funcionalidade.\n");
-    free(h);
-    fclose(arqBin);
-    return;
-  }
-
-  // 2. Criar o grafo
-  Grafo g = criar_grafo(arqBin);
-
-  // 3. Impressão do grafo
-  for (int i = 0; i < g.nroVertices; i++) {
-    // só imprime a linha se a estação tiver caminhos saindo dela
-    if (g.vertices[i].inicioLista != NULL) {
-      printf("%s,", g.vertices[i].nomeEstacao);
-      
-      Aresta *aresta = g.vertices[i].inicioLista;
-      while (aresta != NULL) {
-        printf(" %s, %d, %s", aresta->nomeProxEst, aresta->distancia, aresta->nomesLinha);
-
-        // se ainda tiver uma próxima aresta depois dessa
-        if (aresta->prox != NULL) printf(",");
-
-        aresta = aresta->prox;
-      }
-      printf("\n");
-    }
-  }
-
-  // 4. Liberação da memória e close
-  free_grafo(g);
-  free(h);
-  fclose(arqBin);
-}
-
-
 /* ================================================================================
  
 ******************************FUNCIONALIDADE 12************************************
@@ -228,7 +47,7 @@ static int buscar_indice_vertice(Grafo *g, char *nomeEstacao) {
 }
  
 // Constrói a árvore geradora mínima a partir do grafo original, usando o algoritmo de Prim ensinado em sala de aula,
-// começando pelo vértice de índice origemIdx.
+// começando pelo vértice de índice origemInd.
 //
 /* 
   Desempates: a cada passo, percorremos os vértices já inseridos na árvore (u) em ordem
@@ -238,7 +57,7 @@ static int buscar_indice_vertice(Grafo *g, char *nomeEstacao) {
   em caso de empate de peso fica valendo a primeira encontrada nessa varredura, ou seja, a de
   menor u e, em empate entre u's, a de menor v — exatamente as regras (i) e (ii) do enunciado. 
 */
-static Grafo construir_mst(Grafo *g, int origemIdx) {
+static Grafo construir_mst(Grafo *g, int origemInd) {
   Grafo mst;
   mst.nroVertices = g->nroVertices;
   mst.vertices = malloc(mst.nroVertices * sizeof(Vertice));
@@ -250,7 +69,7 @@ static Grafo construir_mst(Grafo *g, int origemIdx) {
   }
  
   int *naArvore = calloc(g->nroVertices, sizeof(int));
-  naArvore[origemIdx] = 1;
+  naArvore[origemInd] = 1;
   int qtdNaArvore = 1;
  
   // enquanto ainda faltar vértice para entrar na árvore
@@ -271,11 +90,28 @@ static Grafo construir_mst(Grafo *g, int origemIdx) {
  
         // só interessa quem ainda está fora da árvore
         if (v != -1 && !naArvore[v]) {
+          // encontrou uma aresta menor
           if (melhorU == -1 || a->distancia < melhorDist) {
             melhorDist = a->distancia;
             melhorU = u;
             melhorV = v;
             strcpy(melhorLinha, a->nomesLinha);
+          }
+
+          // empate no peso da aresta
+          else if (melhorU != -1 && a->distancia == melhorDist){
+            // regra (ii): se u for menor que o melhorU anterior
+            if (u < melhorU){
+              melhorU = u;
+              melhorV = v;
+              strcpy(melhorLinha, a->nomesLinha);
+            }
+
+            // se u for o mesmo, escolhe o menor v alfabeticamente
+            else if (u == melhorU && v < melhorV){
+              melhorV = v;
+              strcpy(melhorLinha, a->nomesLinha);
+            }
           }
         }
         a = a->prox;
@@ -283,7 +119,10 @@ static Grafo construir_mst(Grafo *g, int origemIdx) {
     }
  
     // se não achou nenhuma aresta de saída, a malha é desconexa: não há mais como crescer
-    if (melhorU == -1) break;
+    if (melhorU == -1) {
+      mst.nroVertices = qtdNaArvore;
+      break;
+    }
  
     naArvore[melhorV] = 1;
     qtdNaArvore++;
@@ -317,14 +156,50 @@ static void imprimir_dfs_mst(Grafo *mst, int idxAtual, int *visitado) {
     a = a->prox;
   }
 }
- 
+
+
+// Deixa o grafo totalmente bidirecional inserindo as voltas que faltam
+void tornar_grafo_bidirecional(Grafo *g) {
+    // Percorre cada estação 'u' do grafo
+    for (int u = 0; u < g->nroVertices; u++) {
+        Aresta *a = g->vertices[u].inicioLista;
+        
+        // Percorre todas as arestas que saem de 'u'
+        while (a != NULL) {
+            // Encontra o índice numérico 'v' da estação de destino (usando busca binária ou linear)
+            int v = buscar_indice_vertice(g, a->nomeProxEst);
+            
+            if (v != -1) {
+                // Verifica se a aresta de volta (v -> u) já existe na lista de 'v'
+                int ja_existe = 0;
+                Aresta *volta = g->vertices[v].inicioLista;
+                while (volta != NULL) {
+                    if (strcmp(volta->nomeProxEst, g->vertices[u].nomeEstacao) == 0) {
+                        ja_existe = 1;
+                        break;
+                    }
+                    volta = volta->prox;
+                }
+                
+                // Se a volta não existir, insere ela de forma ordenada na lista de 'v'!
+                if (!ja_existe) {
+                    inserir_aresta_ordenada(&g->vertices[v], g->vertices[u].nomeEstacao, a->distancia, a->nomesLinha);
+                }
+            }
+            a = a->prox;
+        }
+    }
+}
+
+
 void funcionalidade12() {
   // 1. Abrir arquivo de dados para leitura
   char nomeArqBin[100];
+  char nomeArqInd[100];
   char nomeCampo[100];
   char valorOrigem[200];
  
-  scanf("%s %s", nomeArqBin, nomeCampo); // leitura dos inputs do usuário
+  scanf("%s %s %s", nomeArqBin, nomeArqInd, nomeCampo); // leitura dos inputs do usuário
   ScanQuoteString(valorOrigem); // nomeEstacaoOrigem é campo de tamanho variável, lido entre aspas
  
   // abrir arquivo bin para leitura
@@ -351,10 +226,12 @@ void funcionalidade12() {
  
   // 2. Criar o grafo original a partir da malha existente
   Grafo g = criar_grafo(arqBin);
+
+  tornar_grafo_bidirecional(&g);
  
   // 3. Buscar o vértice de origem informado pelo usuário
-  int origemIdx = buscar_indice_vertice(&g, valorOrigem);
-  if (origemIdx == -1) { // estação de origem não existe na malha
+  int origemInd = buscar_indice_vertice(&g, valorOrigem);
+  if (origemInd == -1) { // estação de origem não existe na malha
     printf("Falha na execução da funcionalidade.\n");
     free_grafo(g);
     free(h);
@@ -363,11 +240,11 @@ void funcionalidade12() {
   }
  
   // 4. Construir a árvore geradora mínima a partir da origem
-  Grafo mst = construir_mst(&g, origemIdx);
+  Grafo mst = construir_mst(&g, origemInd);
  
   // 5. Percorrer a árvore geradora mínima em profundidade, imprimindo as arestas
   int *visitado = calloc(mst.nroVertices, sizeof(int));
-  imprimir_dfs_mst(&mst, origemIdx, visitado);
+  imprimir_dfs_mst(&mst, origemInd, visitado);
   free(visitado);
  
   // 6. Liberação da memória e close
@@ -376,6 +253,3 @@ void funcionalidade12() {
   free(h);
   fclose(arqBin);
 }
-
-
-//precisa mudar os aquivos.h e a main principal

@@ -51,13 +51,13 @@ typedef struct Aresta{
 } Aresta;
 
 // Struct do Vértice
-typedef struct {
+typedef struct Vertice{
   char nomeEstacao[50]; // nome da estação
   Aresta *inicioLista;  // ponteiro para o 1 nó de conexões
 } Vertice;
 
 // Struct do Grafo
-typedef struct {
+typedef struct Grafo{
   Vertice *vertices; // vetor dinâmico de vértices
   int nroVertices;   // quant de estações únicas
 } Grafo;

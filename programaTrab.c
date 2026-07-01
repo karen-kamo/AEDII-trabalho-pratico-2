@@ -63,6 +63,10 @@ int main(){
       dijkstra();
       break;
 
+    case 12:
+      funcionalidade12();
+      break;
+
     default:
       printf("Opção inválida.\n");
   }
