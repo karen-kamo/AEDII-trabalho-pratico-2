@@ -107,8 +107,37 @@ Grafo criar_grafo(FILE *arqBin);
 */
 void funcionalidade10();
 
+
+/*!
+* @brief Funcionalidade 11 para encontrar o menor caminho a partir de um vértice de origem no grafo.
+*
+*/
 void dijkstra();
 
 
 void funcionalidade12();
+
+/*!
+ * @brief Função recursiva de auxiliar na contagem dos ciclos, usando a estratégia da Busca com Retrocesso
+ *
+ * @param g Grafo para fazer a contagem de ciclos.
+ * 
+ * @param indAtual Índice do vértice atual.
+ * 
+ * @param indOrigem Índice do vértice do origem.
+ * 
+ * @param visitado O vetor para saber quem já está no caminho atal.
+ * 
+ * @param comprimento Quantidade de arestas já percorridos.
+ * 
+ * @param totalCiclos Vai armazenar o total ded ciclos encontrados.
+ */
+void contar_ciclos(Grafo *g, int indAtual, int indOrigem, int *visitado, int comprimento, int *totalCiclos);
+
+
+/*!
+* @brief Funcionalidade 13 para todos os caminhos fechados ou ciclos simples do grafo.
+*
+*/
+void funcionalidade13();
 #endif

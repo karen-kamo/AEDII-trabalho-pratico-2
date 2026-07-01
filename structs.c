@@ -24,6 +24,7 @@ void free_reg_dado(RegistroDado* r){
   }
 }
 
+// Liberar as arestas e vertices do grafo
 void free_grafo(Grafo g){
   if (g.vertices == NULL) return;
   

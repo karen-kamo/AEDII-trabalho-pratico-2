@@ -13,6 +13,8 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "escrever_arq.h"
 #include "funcionalidades.h"
 #include "uteis.h"
+#include "uteis_grafo.h"
+
 
 /* ================================================================================
 
@@ -20,7 +22,7 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 
 ===================================================================================*/ 
 /* Funcionalidades: 
-  1. Leitura dos parâmetros conforme a especificação
+  1. Leitura das entradas conforme a especificação
   2. abrir arquivo bin para leitura
   3. inicialização do Grafo
   4. encontrar os índices numéricos da origem e do destino no vetor ordenado
@@ -37,14 +39,15 @@ typedef struct {
 } ControleDijkstra;
 
 void dijkstra() {
-    char nomeArqBin[100], nomeArqInd[100];
-    char campoOrigem[50], campoDestino[50];
-    char estOrigem[100], estDestino[100];
+    char nomeArqBin[100];
+    char nomeArqInd[100];
+    char campoOrigem[50];
+    char campoDestino[50];
+    char estOrigem[100];
+    char estDestino[100];
 
-    // 1. Leitura dos parâmetros conforme a especificação
-    scanf("%s", nomeArqBin);
-    scanf("%s", nomeArqInd);
-    scanf("%s", campoOrigem);
+    // 1. Leitura das entradas conforme a especificação
+    scanf("%s %s %s", nomeArqBin, nomeArqInd, campoOrigem);
     ScanQuoteString(estOrigem); 
     scanf("%s", campoDestino);
     ScanQuoteString(estDestino);
@@ -74,14 +77,9 @@ void dijkstra() {
     // 3. inicialização do Grafo
     Grafo g = criar_grafo(arqBin);
 
-    // 4. encontrar os índices numéricos da origem e do destino no vetor ordenado
-    int indOrigem = -1;
-    int indDestino = -1;
-    for (int i = 0; i < g.nroVertices; i++) {
-        // se nome inserido bate com o nome no grafo
-        if (strcmp(g.vertices[i].nomeEstacao, estOrigem) == 0) indOrigem = i; 
-        if (strcmp(g.vertices[i].nomeEstacao, estDestino) == 0) indDestino = i;
-    }
+    // 4. encontrar os índices da origem e do destino no vetor ordenado
+    int indOrigem = buscar_indice_vertice(&g, estOrigem);
+    int indDestino = buscar_indice_vertice(&g, estDestino);
 
     // se alguma das estações não existir no grafo
     if (indOrigem == -1 || indDestino == -1) {
@@ -105,28 +103,6 @@ void dijkstra() {
     // como é a origem, deve ter distância 0
     controle[indOrigem].distancia = 0;
 
-    // verificação da lista de adjacência do vértice de origem
-    // atualiza as distâncias no controle
-    Aresta *arestaOrigem = g.vertices[indOrigem].inicioLista; // pega o primeiro caminho que sai da estação de origem
-
-    while (arestaOrigem != NULL) {
-        int indAdj = -1; // p/ guardar o índice 
-        for (int i = 0; i < g.nroVertices; i++) {
-            if (strcmp(g.vertices[i].nomeEstacao, arestaOrigem->nomeProxEst) == 0) {
-                // se o nome bate com o nome de destino salvo na aresta
-                indAdj = i; // guarda o índice
-                break;
-            }
-        }
-        // se encontrou, armazena os valores na tabela de controle
-        if (indAdj != -1) {
-            controle[indAdj].distancia = arestaOrigem->distancia;
-            controle[indAdj].antecessor = indOrigem;
-        }
-
-        arestaOrigem = (Aresta *) arestaOrigem->prox;
-    }
-
     // loop para achar menor caminho para cada estação do grafo
     for (int cont = 0; cont < g.nroVertices; cont++) {
         
@@ -134,7 +110,7 @@ void dijkstra() {
         int w = -1; // guarda índice do melhor vértice
         int menorDist = 99999999; // guarda distancia até essa melhor estação
 
-        // loop para percorrer toda tabela de controle
+        // loop para percorrer toda lista de controle
         for (int i = 0; i < g.nroVertices; i++) {
             // verifica se pertence ao conjunto (V - S) e se distancia é menor do que já tem
             if (!controle[i].visitado && controle[i].distancia < menorDist) {
@@ -153,14 +129,7 @@ void dijkstra() {
         Aresta *aresta = g.vertices[w].inicioLista;
 
         while (aresta != NULL) {
-            int v = -1; // guardar índice de v (estação vizinha)
-            // para descobrir qual o índice de v
-            for (int i = 0; i < g.nroVertices; i++) {
-                if (strcmp(g.vertices[i].nomeEstacao, aresta->nomeProxEst) == 0) {
-                    v = i;
-                    break;
-                }
-            }
+            int v = buscar_indice_vertice(&g, aresta->nomeProxEst); // guardar índice de v (estação vizinha)
 
             // se foi encontrado e ainda não foi visitado
             if (v != -1 && !controle[v].visitado) {
@@ -207,9 +176,7 @@ void dijkstra() {
         // Linha 3: nomeEstOrigem, ..., nomeEstDestino
         for (int i = tamCaminho - 1; i >= 0; i--) {
             printf("%s", g.vertices[caminho[i]].nomeEstacao);
-            if (i > 0) {
-                printf(", ");
-            }
+            if (i > 0) printf(", ");
         }
         printf("\n");
 

@@ -13,6 +13,7 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "escrever_arq.h"
 #include "funcionalidades.h"
 #include "uteis.h"
+#include "uteis_grafo.h"
 
 Grafo criar_grafo(FILE *arqBin){
   // Criar e inicializar o grafo
@@ -81,14 +82,7 @@ Grafo criar_grafo(FILE *arqBin){
     }
 
     // procurando o índice da estação atual no vetor
-    int indOrigem = -1; // para guardar o índice
-    for (int i = 0; i < g.nroVertices; i++){
-      if (strcmp(g.vertices[i].nomeEstacao, r->nomeEstacao) == 0){
-        // se o nome bater, achou o índice
-        indOrigem = i;
-        break;
-      }
-    }
+    int indOrigem = buscar_indice_vertice(&g, r->nomeEstacao);
 
     // se acharmos o vértice de origem no vetor
     if (indOrigem != -1){

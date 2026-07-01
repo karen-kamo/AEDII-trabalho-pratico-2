@@ -67,10 +67,13 @@ int main(){
       funcionalidade12();
       break;
 
+    case 13:
+      funcionalidade13();
+      break;
+
     default:
       printf("Opção inválida.\n");
   }
- 
 
   return 0;
 }
