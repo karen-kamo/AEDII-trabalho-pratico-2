@@ -108,4 +108,7 @@ Grafo criar_grafo(FILE *arqBin);
 void funcionalidade10();
 
 void dijkstra();
+
+
+void funcionalidade12();
 #endif

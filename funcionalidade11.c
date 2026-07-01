@@ -25,6 +25,7 @@ Rebeca de Oliveira Silva - NUSP: 11963923
   3. inicialização do Grafo
   4. encontrar os índices numéricos da origem e do destino no vetor ordenado
   5. aplicando Dijkstra
+  6. Impressão do menor caminho
   7. Liberações e close
 */
 
@@ -48,7 +49,7 @@ void dijkstra() {
     scanf("%s", campoDestino);
     ScanQuoteString(estDestino);
 
-    // 2. abrir arquivo bin para leitura
+    // 2. abrir arquivo de dados para leitura
     FILE *arqBin = fopen(nomeArqBin, "rb");
     if (arqBin == NULL) {
         printf("Falha na execução da funcionalidade.\n");
