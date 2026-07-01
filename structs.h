@@ -44,7 +44,7 @@ typedef struct {
 
 // Struct para o Nó da lista linear (Aresta)
 typedef struct Aresta{
-  char nomeProxEst[50]; // nome da pŕxoima estação
+  char nomeProxEst[50]; // nome da próxima estação
   int distancia;        // distância até próxima estação
   char nomesLinha[100]; // nomes das linhas associadas
   struct Aresta *prox;  // próximo nó da lista

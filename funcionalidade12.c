@@ -13,6 +13,8 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "escrever_arq.h"
 #include "funcionalidades.h"
 #include "uteis.h"
+#include "uteis_grafo.h"
+
 
 /* ================================================================================
  
@@ -27,24 +29,6 @@ Rebeca de Oliveira Silva - NUSP: 11963923
   5. Percorrer a árvore geradora mínima em profundidade, imprimindo cada aresta
   6. Liberação da memória e close
 */
- 
-// Busca o índice de um vértice no grafo a partir do nome da estação.
-// Usa busca binária pois o vetor de vértices já está ordenado por nome (ver criar_grafo).
-static int buscar_indice_vertice(Grafo *g, char *nomeEstacao) {
-  int ini = 0;
-  int fim = g->nroVertices - 1;
- 
-  while (ini <= fim) {
-    int meio = (ini + fim) / 2;
-    int comp = strcmp(g->vertices[meio].nomeEstacao, nomeEstacao);
- 
-    if (comp == 0) return meio;
-    else if (comp < 0) ini = meio + 1;
-    else fim = meio - 1;
-  }
- 
-  return -1;
-}
  
 // Constrói a árvore geradora mínima a partir do grafo original, usando o algoritmo de Prim ensinado em sala de aula,
 // começando pelo vértice de índice origemInd.

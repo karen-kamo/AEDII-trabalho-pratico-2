@@ -214,44 +214,6 @@ int existe_nome_estacao(FILE *arqBin, RegistroCabecalho *h, char *nomeProcurado,
  */
 int existe_par(FILE *arqBin, RegistroCabecalho *h, int codEstacao, int codProxEstacao, int rrnIgnorado);
 
-
-/*!
- * @brief Função auxiliar para usar o qsort.
- */
-int comparar_vertices(const void *a, const void *b);
-
-
-/*!
- * @brief Função para buscar o nome da estação a partir do codEstacao.
- *
- * @param arqBin O arquivo de dados.
- * 
- * @param codBuscado O codEstacao buscado.
- * 
- * @return Retorna o nome da estação encontrada.
- */
-char *buscar_nome_por_codigo(FILE *arqBin, int codBuscado);
-
-
-/*!
- * @brief Função para pegar uma linha entre duas estações e colocá-la no lugar exato da lista da estação de origem, garantindo que não duplique destinos e mantenha a ordem alfabética.
- *
- * @param v O ponteiro do vértice da estação de origem.
- * 
- * @param nomeProx O nome da próxima estação que está no registro.
- * 
- * @param dist A distância entre as estações.
- * 
- * @param nomeLinha O nome da linha que conecta as estações.
- */
-void inserir_aresta_ordenada(Vertice *v, char *nomeProx, int dist, char *nomeLinha);
-
-/*!
- * @brief Função auxiliar para ordenar as linhas dentro da string.
- *
- * @param nomesLinha String com os nomes das linhas que devem ser ordenadas.
- */
-void ordenar_linhas(char *nomesLinha);
 #endif
 
 
