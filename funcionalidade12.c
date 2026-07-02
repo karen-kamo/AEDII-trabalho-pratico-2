@@ -194,16 +194,10 @@ void funcionalidade12() {
   }
  
   RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
-  if (h == NULL) { // verifica se a alocação não ocorreu
+  // verifica se a alocação não ocorreu ou é inconsistente
+  if (h == NULL || h->status == '0'){ 
     printf("Falha na execução da funcionalidade.\n");
-    fclose(arqBin);
-    return;
-  }
- 
-  // vendo se é inconsistente
-  if (h->status == '0') {
-    printf("Falha na execução da funcionalidade.\n");
-    free(h);
+    free_reg_cab(h);
     fclose(arqBin);
     return;
   }

@@ -118,7 +118,7 @@ void dijkstra();
 void funcionalidade12();
 
 /*!
- * @brief Função recursiva de auxiliar na contagem dos ciclos, usando a estratégia da Busca com Retrocesso
+ * @brief Função recursiva para auxiliar na contagem dos ciclos, usando a busca em profundidade
  *
  * @param g Grafo para fazer a contagem de ciclos.
  * 
