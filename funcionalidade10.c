@@ -16,14 +16,14 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "uteis_grafo.h"
 
 Grafo criar_grafo(FILE *arqBin){
-  // Criar e inicializar o grafo
+  // criar e inicializar o grafo
   Grafo g;
   g.nroVertices = 0;
   g.vertices = NULL;
 
   fseek(arqBin, 17, SEEK_SET); // pula o cabeçalho
 
-  // Ler todo o arquivo de dados para guardar os vértices
+  // ler todo o arquivo de dados para criar os vértices vendo se são nomes únicas
   while (check_eof(arqBin)){
     RegistroDado *r = ler_reg_dado_bin(arqBin);
     if (r == NULL) break; // se não conseguiu ler
@@ -35,7 +35,7 @@ Grafo criar_grafo(FILE *arqBin){
       continue;
     }
 
-    // guardar novo nomeEstacao
+    // só vai criar um vértice novo se o nome ainda não apareceu
     int flagExiste = 0; // p/ ver se tem mesmo nome
 
     // percorre todos os vertices que existem
@@ -50,7 +50,6 @@ Grafo criar_grafo(FILE *arqBin){
     if (!flagExiste){
       g.nroVertices++; // incrementa a quant de novos únicos
 
-      // realoca para caber mais um nome
       g.vertices = realloc(g.vertices, g.nroVertices * sizeof(Vertice));
 
       // salva o nome na lista
@@ -67,7 +66,7 @@ Grafo criar_grafo(FILE *arqBin){
   // ordena pelo nomeEstacao
   qsort(g.vertices, g.nroVertices, sizeof(Vertice), comparar_vertices);
 
-  // Ler todo o arquivo de dados para guardar as arestas
+  // com os vértices já criados, tem que montar as arestas dos vértices
   fseek(arqBin, 17, SEEK_SET); // pula o cabeçalho
 
   while (check_eof(arqBin)){
@@ -81,7 +80,6 @@ Grafo criar_grafo(FILE *arqBin){
       continue;
     }
 
-    // procurando o índice da estação atual no vetor
     int indOrigem = buscar_indice_vertice(&g, r->nomeEstacao);
 
     // se acharmos o vértice de origem no vetor
@@ -122,40 +120,32 @@ Grafo criar_grafo(FILE *arqBin){
 ******************************FUNCIONALIDADE 10************************************
 
 ===================================================================================*/ 
+
 /* Funcionalidades: 
-  1. Abrir arquivo de dados para leitura
-  2. Criar e inicializar o grafo
-  3. Ler todo o arquivo de dados para guardar os vértices
-  4. Ler todo o arquivo de dados para guardar as arestas
-  5. Impressão do grafo
-  6. Liberação da memória e close
+
+  1. Abrir o arquivo.bin para leitura
+  2. Criar o grafo
+  3. Impressão do grafo
 */
 
 void funcionalidade10() {
-  // 1. Abrir arquivo de dados para leitura
   char nomeArqBin[100];
   char nomeArqInd[100];
 
-  scanf("%s %s", nomeArqBin, nomeArqInd); // leitura dos inputs do usuário
+  scanf("%s %s", nomeArqBin, nomeArqInd);
 
-  // abrir arquivo bin para leitura
+  // 1. Abrir o arquivo.bin para leitura
   FILE *arqBin = fopen(nomeArqBin, "rb");
   if (arqBin == NULL) {
     printf("Falha na execução da funcionalidade.\n");
     return;
   }
 
-  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
-  if (h == NULL){ // verifica se a alocação não ocorreu
+  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); 
+  // verifica se a alocação não ocorreu ou é inconsistente
+  if (h == NULL || h->status == '0'){ 
     printf("Falha na execução da funcionalidade.\n");
-    fclose(arqBin);
-    return;
-  }
-
-  // vendo se é inconsistente 
-  if (h->status == '0'){
-    printf("Falha na execução da funcionalidade.\n");
-    free(h);
+    free_reg_cab(h);
     fclose(arqBin);
     return;
   }
@@ -182,10 +172,12 @@ void funcionalidade10() {
     }
   }
 
-  // 4. Liberação da memória e close
+  
   free_grafo(g);
   free(h);
   fclose(arqBin);
 }
+
+
 
 

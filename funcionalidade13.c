@@ -19,7 +19,6 @@ void contar_ciclos(Grafo *g, int indAtual, int indOrigem, int *visitado, int com
   // percorre as arestas do vértice atual
   Aresta *a = g->vertices[indAtual].inicioLista;
   while (a != NULL){
-    // índice no vetor do grafo que corresponde ao nome de destino
     int v = buscar_indice_vertice(g, a->nomeProxEst);
 
     // se não encontrou, vai p/ próxima aresta
@@ -28,20 +27,22 @@ void contar_ciclos(Grafo *g, int indAtual, int indOrigem, int *visitado, int com
       continue;
     }
 
-    // vê se é a origem
     if (v == indOrigem){
-      // se o tamanho que percorremos é >= a 1
+      // só conta como ciclo se já andou pelo menos uma aresta
+      // senão a origem voltaria para si mesma
       if (comprimento >= 1) (*totalCiclos)++;
     }
 
     // se ainda não foi visitado
     else if (!visitado[v]){
-      visitado[v] = 1; // marca vértice antes de entrar na ramificação
+      // marca vértice antes de descer na recursão e desmarca depois
+      // para que ele possa ser usado em outros ciclos
+      visitado[v] = 1; 
 
       // recursão, sendo a estação atual o v
       contar_ciclos(g, v, indOrigem, visitado, comprimento + 1, totalCiclos);
 
-      visitado[v] = 0; // p/ que possa ser visitada em rotas alternativas
+      visitado[v] = 0; 
     }
 
     a = a->prox;
@@ -53,12 +54,11 @@ void contar_ciclos(Grafo *g, int indAtual, int indOrigem, int *visitado, int com
  
 ===================================================================================*/
 /* Funcionalidades: 
-  1. leitura dos dados de entrada
-  2. abrir arquivo de dados para leitura
-  3. inicialização do Grafo
-  4. conta os ciclos existentes
-  5. impressão da mensagem
-  6. liberação da memória e close
+
+  1. Abrir arquivo de dados para leitura
+  2. Inicialização do Grafo
+  3. Contar os ciclos existentes
+  4. Impressão da mensagem
 */
 
 void funcionalidade13(){
@@ -67,36 +67,29 @@ void funcionalidade13(){
   char nomeCampo[100];
   char valorOrigem[100];
 
-  // 1. leitura dos dados de entrada
   scanf("%s %s %s", nomeArqBin, nomeArqInd, nomeCampo);
   ScanQuoteString(valorOrigem);
 
-  // 2. abrir arquivo de dados para leitura
+  // 1. Abrir arquivo de dados para leitura
   FILE *arqBin = fopen(nomeArqBin, "rb");
   if (arqBin == NULL) {
     printf("Falha na execução da funcionalidade.\n");
     return;
   }
 
-  RegistroCabecalho *h = ler_reg_cab_bin(arqBin); // leitura do registro de cabeçalho
-  if (h == NULL){ // verifica se a alocação não ocorreu
+  RegistroCabecalho *h = ler_reg_cab_bin(arqBin);
+  // verifica se a alocação não ocorreu ou é inconsistente
+  if (h == NULL || h->status == '0'){ 
     printf("Falha na execução da funcionalidade.\n");
+    free_reg_cab(h);
     fclose(arqBin);
     return;
   }
 
-  // vendo se é inconsistente 
-  if (h->status == '0'){
-    printf("Falha na execução da funcionalidade.\n");
-    free(h);
-    fclose(arqBin);
-    return;
-  }
-
-  // 3. inicialização do Grafo
+  // 2. Inicialização do Grafo
   Grafo g = criar_grafo(arqBin);
 
-  // busca o vértice de origem 
+  // precisa saber se o de origem existe
   int origemInd = buscar_indice_vertice(&g, valorOrigem);
   if (origemInd == -1){
     printf("Falha na execução da funcionalidade.\n");
@@ -113,14 +106,13 @@ void funcionalidade13(){
   // inicia a busca a partir da origem
   visitado[origemInd] = 1;
 
-  // 4. conta os ciclos existentes
+  // 3. Contar os ciclos existentes
   contar_ciclos(&g, origemInd, origemInd, visitado, 0, &totalCiclos);
 
-  // 5. impressão da mensagem
+  // 4. Impressão da mensagem
   if (totalCiclos == 0) printf("Quantidade de ciclos: -1\n");
   else printf("Quantidade de ciclos: %d\n", totalCiclos);
 
-  // 6. liberação da memória e close
   free(visitado);
   free_grafo(g);
   free(h);

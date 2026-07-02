@@ -16,7 +16,6 @@ Rebeca de Oliveira Silva - NUSP: 11963923
 #include "uteis.h"
 
 int comparar_vertices(const void *a, const void *b) {
-  // transforma os ponteiros genéricos em ponteiros de Vertice
   const Vertice *v1 = (const Vertice *)a;
   const Vertice *v2 = (const Vertice *)b;
   
@@ -50,7 +49,7 @@ char *buscar_nome_por_codigo(FILE *arqBin, int codBuscado) {
     free(r);
   }
 
-  // Rrestaura a posição original do arquivo
+  // restaura a posição original do arquivo
   fseek(arqBin, posAnterior, SEEK_SET);
   return nomeEncontrado;
 }
@@ -61,7 +60,7 @@ void ordenar_linhas(char *nomesLinha) {
   char buffer[200];
   strcpy(buffer, nomesLinha);
 
-  char *palavras[20]; // pode até 20 linhas integradas na mesma estação
+  char *palavras[20]; 
   int qtd = 0;
 
   // separa a string por vírgulas e espaços
@@ -71,7 +70,7 @@ void ordenar_linhas(char *nomesLinha) {
     token = strtok(NULL, ", ");
   }
 
-  // Bubble Sort das palavras
+  // usamos o bubble mesmo p/ ordenar de forms alfabética
   for (int i = 0; i < qtd - 1; i++) {
     for (int j = i + 1; j < qtd; j++) {
       if (strcmp(palavras[i], palavras[j]) > 0) {
@@ -82,7 +81,7 @@ void ordenar_linhas(char *nomesLinha) {
     }
   }
 
-  // remonta a string original com as palavras ordenadas e separadas por ,
+  // monta a string original com as palavras ordenadas e separadas por vírgula
   nomesLinha[0] = '\0';
   for (int i = 0; i < qtd; i++) {
     strcat(nomesLinha, palavras[i]);
@@ -113,7 +112,7 @@ void inserir_aresta_ordenada(Vertice *v, char *nomeProx, int dist, char *nomeLin
     atual = atual->prox;
   }
 
-  // se for um destino inédito, aloca a nova aresta
+  // se for um destino novo, aloca a nova aresta
   struct Aresta *nova = (struct Aresta *) malloc(sizeof(Aresta));
 
   // coloca os dados na nova aresta
